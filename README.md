@@ -58,6 +58,14 @@ docker-compose up -d
 streamlit run dashboard.py
 ```
 
+## 🧠 Using the Pre-Trained Brain
+SiliconBrain comes with a pre-trained memory of **15,000+ nodes** covering Python, Rust, and TypeScript. To inject this memory into your local instance:
+1. Ensure Memgraph is running: `docker-compose up -d`
+2. Run the injection command:
+```bash
+cat data/trained_brain.cypher | docker exec -i memgraph mgconsole --output_format=cypherl
+```
+
 ## 🛠️ Troubleshooting
 - **Docker Connection:** If you see a `Connection Refused` error, ensure Docker Desktop is running and run `docker-compose up -d` to start the Memgraph container.
 - **Ollama API:** Ensure `ollama serve` is active. SiliconBrain looks for Ollama on the default port `11434`.
