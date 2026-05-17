@@ -1,0 +1,8 @@
+requests==2.32.3
+pydantic==2.10.4
+neo4j==5.27.0
+langgraph==0.2.60
+langchain-openai==0.2.14
+pyvis==0.3.2
+streamlit==1.41.1
+python-dotenv==1.0.1

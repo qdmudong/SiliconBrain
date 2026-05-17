@@ -1,0 +1,88 @@
+{
+    "$defs": {
+        "StateTransition": {
+            "properties": {
+                "current_state": {
+                    "description": "The current state in the workflow",
+                    "title": "Current State",
+                    "type": "string"
+                },
+                "action": {
+                    "description": "The action that triggers the transition",
+                    "title": "Action",
+                    "type": "string"
+                },
+                "next_state": {
+                    "description": "The resulting state",
+                    "title": "Next State",
+                    "type": "string"
+                },
+                "required_knowledge": {
+                    "description": "Entities/concepts from the KG required for this step",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Required Knowledge",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "current_state",
+                "action",
+                "next_state"
+            ],
+            "title": "StateTransition",
+            "type": "object"
+        },
+        "Triple": {
+            "properties": {
+                "subject": {
+                    "description": "The entity being described",
+                    "title": "Subject",
+                    "type": "string"
+                },
+                "predicate": {
+                    "description": "The relationship between subject and object",
+                    "title": "Predicate",
+                    "type": "string"
+                },
+                "object": {
+                    "description": "The target entity or value",
+                    "title": "Object",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "subject",
+                "predicate",
+                "object"
+            ],
+            "title": "Triple",
+            "type": "object"
+        }
+    },
+    "properties": {
+        "knowledge_graph": {
+            "description": "Declarative 'What' layer",
+            "items": {
+                "$ref": "#/$defs/Triple"
+            },
+            "title": "Knowledge Graph",
+            "type": "array"
+        },
+        "procedural_map": {
+            "description": "Procedural 'How' layer",
+            "items": {
+                "$ref": "#/$defs/StateTransition"
+            },
+            "title": "Procedural Map",
+            "type": "array"
+        }
+    },
+    "required": [
+        "knowledge_graph",
+        "procedural_map"
+    ],
+    "title": "HybridMap",
+    "type": "object"
+}
