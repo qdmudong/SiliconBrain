@@ -10,7 +10,7 @@ SiliconBrain is a high-performance **Neuro-Symbolic Framework** designed to run 
 ## 🚀 Key Features
 
 - **Domain-Agnostic Mastery:** Use the Mastery Engine to "download" expert-level knowledge in any field (Medicine, Law, Engineering, etc.) into a local graph.
-- **Sparse Activation:** Saves up to **90% in tokens** by only retrieving relevant graph nodes instead of massive raw text contexts.
+- **Sparse Activation:** Saves **up to 90% in tokens** by only retrieving relevant graph nodes instead of massive raw text contexts.
 - **Autonomous Learning:** Features a **Curiosity Engine** that identifies gaps in its own knowledge and bridges them automatically.
 - **20-Watt Local Mode:** Designed to run the primary chat orchestration on your local CPU (via Ollama) while using high-IQ models (via DeepSeek) for background learning.
 - **Visual Reasoning:** Interactive **Knowledge Map Viewer** (via PyVis) lets you explore the brain's evolving memory in your browser.
