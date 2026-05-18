@@ -1,21 +1,25 @@
-# 🧠 SiliconBrain: The 20-Watt Local Expert
+# 🧠 SiliconBrain: The 20-Watt General-Purpose Expert
 
 ![Knowledge Map Demo](assets/knowledge_map_demo.png)
 
 ## 🚧 Project Status: Proof of Concept
-SiliconBrain is a **functional research prototype**. While the trilingual expert system is fully operational and capable of advanced architectural reasoning, it is primarily a demonstration of the **20-Watt efficiency vision**. We are currently in the "Zero-to-One" phase and invite contributors to help refine the neuro-symbolic pathways.
+SiliconBrain is a **functional research prototype** of a general-purpose Neuro-Symbolic AI system. While it ships with a massive pre-loaded library for software engineering, the underlying architecture is designed to **master any technical or creative domain** autonomously.
 
-SiliconBrain is a high-performance
- **Neuro-Symbolic AI system** designed to run on local hardware with the efficiency of a human brain (~20 Watts).
- By separating **Declarative Knowledge** (Facts in a Graph Database) from **Procedural Logic** (State Machines), SiliconBrain enables tiny local models (like Llama 3 3B) to achieve the reasoning capabilities of trillion-parameter giants.
+SiliconBrain is a high-performance **Neuro-Symbolic Framework** designed to run on local hardware with the efficiency of a human brain (~20 Watts). By separating **Declarative Knowledge** (Facts in a Graph Database) from **Procedural Logic** (State Machines), SiliconBrain enables tiny local models to achieve the reasoning capabilities of trillion-parameter giants.
 
 ## 🚀 Key Features
 
-- **Hybrid Intelligence:** Combines the factual accuracy of **Memgraph** with the agentic reasoning of **LangGraph**.
+- **Domain-Agnostic Mastery:** Use the Mastery Engine to "download" expert-level knowledge in any field (Medicine, Law, Engineering, etc.) into a local graph.
 - **Sparse Activation:** Saves up to **90% in tokens** by only retrieving relevant graph nodes instead of massive raw text contexts.
-- **Autonomous Learning:** Features a **Curiosity Engine** and **Recursive Domain Mastery** to build local expert libraries automatically.
-- **Trilingual Mastery:** Comes pre-configured to master **Python, Rust, and TypeScript** ecosystems.
+- **Autonomous Learning:** Features a **Curiosity Engine** that identifies gaps in its own knowledge and bridges them automatically.
 - **20-Watt Local Mode:** Designed to run the primary chat orchestration on your local CPU (via Ollama) while using high-IQ models (via DeepSeek) for background learning.
+- **Visual Reasoning:** Interactive **Knowledge Map Viewer** (via PyVis) lets you explore the brain's evolving memory in your browser.
+
+## 📦 Pre-Loaded: Software Engineering Knowledge Pack
+As a demonstration of its power, this repository includes a pre-trained memory of **15,000+ nodes** covering the deep-lore and architectural patterns of:
+- **Python:** Internals, DDD, Performance, and Meta-programming.
+- **Rust:** Ownership, Fearless Concurrency, and Async internals.
+- **TypeScript:** Advanced Type System, Compiler API, and Full-stack patterns.
 
 ## 🛠️ Tech Stack
 
