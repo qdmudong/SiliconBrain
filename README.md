@@ -1,39 +1,84 @@
 # 🧠 SiliconBrain: The 20-Watt General-Purpose Expert
 
-![Knowledge Map Demo](assets/knowledge_map_demo.png)
-
-## 🚧 Project Status: Proof of Concept
-SiliconBrain is a **functional research prototype** of a general-purpose Neuro-Symbolic AI system. While it ships with a massive pre-loaded library for software engineering, the underlying architecture is designed to **master any technical or creative domain** autonomously.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![LangGraph](https://img.shields.io/badge/orchestration-LangGraph-orange.svg)](https://github.com/langchain-ai/langgraph)
+[![Memgraph](https://img.shields.io/badge/database-Memgraph-red.svg)](https://memgraph.com/)
+[![Ollama](https://img.shields.io/badge/local%20LLM-Ollama-black.svg)](https://ollama.com/)
 
 SiliconBrain is a high-performance **Neuro-Symbolic Framework** designed to run on local hardware with the efficiency of a human brain (~20 Watts). By separating **Declarative Knowledge** (Facts in a Graph Database) from **Procedural Logic** (State Machines), SiliconBrain enables tiny local models to achieve the reasoning capabilities of trillion-parameter giants.
 
+![Knowledge Map Demo](assets/knowledge_map_demo.png)
+
+## 🚧 Project Status: Proof of Concept
+
+SiliconBrain is a **functional research prototype** of a general-purpose Neuro-Symbolic AI system. While it ships with a massive pre-loaded library for software engineering, the underlying architecture is designed to **master any technical or creative domain** autonomously.
+
+---
+
 ## 🚀 Key Features
 
-- **Domain-Agnostic Mastery:** Use the Mastery Engine to "download" expert-level knowledge in any field (Medicine, Law, Engineering, etc.) into a local graph.
-- **Sparse Activation:** Saves **up to 90% in tokens** by only retrieving relevant graph nodes instead of massive raw text contexts.
-- **Autonomous Learning:** Features a **Curiosity Engine** that identifies gaps in its own knowledge and bridges them automatically.
-- **20-Watt Local Mode:** Designed to run the primary chat orchestration on your local CPU (via Ollama) while using high-IQ models (via DeepSeek) for background learning.
-- **Visual Reasoning:** Interactive **Knowledge Map Viewer** (via PyVis) lets you explore the brain's evolving memory in your browser.
+*   **Domain-Agnostic Mastery:** Use the Mastery Engine to "download" expert-level knowledge in any field (Medicine, Law, Engineering, etc.) into a local graph database.
+*   **Sparse Activation:** Saves **up to 90% in tokens** by only retrieving relevant graph nodes instead of feeding massive raw text contexts to the LLM.
+*   **Autonomous Curiosity Engine:** Features a background loop that identifies gaps in its own knowledge, ponders what it needs to learn next, and bridges those gaps automatically.
+*   **20-Watt Local Mode:** Designed to run the primary chat orchestration on your local CPU (via Ollama) while leveraging high-IQ reasoning models (via DeepSeek) for background learning.
+*   **Visual Reasoning:** Interactive **Knowledge Map Viewer** (via PyVis) lets you explore the brain's evolving memory and state transitions directly in your browser.
+
+---
+
+## 🗺️ System Architecture
+
+SiliconBrain splits cognitive tasks into two distinct layers:
+1.  **The "What" Layer (Declarative):** Structured triplets (`{subject, predicate, object}`) stored in **Memgraph**.
+2.  **The "How" Layer (Procedural):** Structured state transitions (`{current_state, action, next_state}`) orchestrating workflows via **LangGraph**.
+
+```mermaid
+graph TD
+    User([User Query]) --> Interpreter[Interpreter Node: Maps intent to State]
+    Interpreter --> Executor[Executor Node: Queries KG & runs transitions]
+    Executor --> DB[(Memgraph DB)]
+    Executor --> Synthesizer[Synthesizer Node: Compiles final response]
+    Synthesizer --> User
+    
+    subgraph Learning Loop
+        Teacher[Teacher LLM: DeepSeek API] --> Extractor[Librarian: layers/extractor.py]
+        Extractor --> DB
+        Curiosity[Curiosity Engine: layers/curiosity.py] -->|1. Identifies Gaps| Teacher
+    end
+```
+
+### Core Components:
+*   **The Orchestrator ([layers/orchestration_v2.py](layers/orchestration_v2.py)):** A LangGraph agent that performs sparse graph retrieval to answer user queries with minimal token usage.
+*   **The Librarian ([layers/extractor.py](layers/extractor.py)):** Parses raw explanation texts and distills them into structured entity triplets and state-transition schemas.
+*   **The Teacher Interface ([layers/teacher.py](layers/teacher.py)):** Queries a high-IQ LLM to explain complex domains.
+*   **The Curiosity Engine ([layers/curiosity.py](layers/curiosity.py)):** Shuffles current database entities, ponders knowledge gaps, and schedules new topics for the Teacher to distill.
+
+---
 
 ## 📦 Pre-Loaded: Software Engineering Knowledge Pack
+
 As a demonstration of its power, this repository includes a pre-trained memory of **15,000+ nodes** covering the deep-lore and architectural patterns of:
-- **Python:** Internals, DDD, Performance, and Meta-programming.
-- **Rust:** Ownership, Fearless Concurrency, and Async internals.
-- **TypeScript:** Advanced Type System, Compiler API, and Full-stack patterns.
+*   **Python:** Internals, DDD, Performance, and Meta-programming.
+*   **Rust:** Ownership, Fearless Concurrency, and Async internals.
+*   **TypeScript:** Advanced Type System, Compiler API, and Full-stack patterns.
 
-## 🛠️ Tech Stack
+---
 
-- **Memory:** Memgraph (Graph Database)
-- **Logic:** LangGraph (State Machines)
-- **Interface:** Streamlit (Web Dashboard)
-- **Compute:** Ollama (Local) & DeepSeek API (Teacher)
-- **Orchestration:** Python (LangChain)
+## 🔋 The Efficiency Proof
 
-## 🚦 Quick Start
+SiliconBrain includes a live **Efficiency Report** in the dashboard comparing:
+*   **Scenario A:** Standard LLM (Full-Context RAG)
+*   **Scenario B:** SiliconBrain (Sparse Graph Retrieval)
+
+For complex technical queries, Scenario B typically demonstrates a **10x reduction in compute requirements** (90%+ tokens saved) by loading only the localized neighborhood of nodes relative to the user's intent.
+
+---
+
+## 🛠️ Quick Start
 
 ### 1. Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Ollama](https://ollama.com/) (Download `llama3.2:3b`)
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+*   [Ollama](https://ollama.com/) (Ensure the daemon is running and you have `llama3.2:3b` or your preferred local model pulled)
 
 ### 2. Setup
 ```bash
@@ -50,44 +95,32 @@ pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env and add your DeepSeek API Key
+# Edit .env and configure your API keys and model preferences
 ```
 
-### 3. Launch
+### 3. Inject the Pre-Trained Brain
+Ensure Memgraph is running, then run the injection command to load the 15,000+ node software engineering knowledge pack:
 ```bash
-# Start the Knowledge Graph
+# Start the Knowledge Graph container
 docker-compose up -d
 
-# Start the Dashboard
-streamlit run dashboard.py
-```
-
-## 🧠 Using the Pre-Trained Brain
-SiliconBrain comes with a pre-trained memory of **15,000+ nodes** covering Python, Rust, and TypeScript. To inject this memory into your local instance:
-1. Ensure Memgraph is running: `docker-compose up -d`
-2. Run the injection command:
-```bash
+# Inject cypher snapshot
 cat data/trained_brain.cypher | docker exec -i memgraph mgconsole --output_format=cypherl
 ```
 
-## 🛠️ Troubleshooting
-- **Docker Connection:** If you see a `Connection Refused` error, ensure Docker Desktop is running and run `docker-compose up -d` to start the Memgraph container.
-- **Ollama API:** Ensure `ollama serve` is active. SiliconBrain looks for Ollama on the default port `11434`.
-- **API Keys:** Make sure your DeepSeek key is correctly placed in the `.env` file for the "Teacher" to function.
-
-## 🗺️ System Architecture
-
-1.  **The Librarian (`layers/extractor.py`):** Converts raw text/explanations into structured Triplets.
-2.  **The Brain Memory:** Stores thousands of technical interconnections in Memgraph.
-3.  **The Orchestrator (`layers/orchestration_v2.py`):** A LangGraph agent that performs sparse retrieval to answer queries.
-4.  **The Mastery Engine:** Recursively interrogates a "Teacher" LLM to map out entire programming domains.
-
-## 🔋 The Efficiency Proof
-SiliconBrain includes a live **Efficiency Report** that compares Scenario A (Standard LLM Full-Context) vs Scenario B (SiliconBrain Sparse Graph). Most technical queries show a **10x reduction in compute requirements**.
+### 4. Launch the Dashboard
+```bash
+streamlit run dashboard.py
+```
+Open your browser to `http://localhost:8501` to chat with the brain, view the interactive visual map, or launch recursive mastery engines.
 
 ---
-*Created with the vision of efficient, grounded, and local-first intelligence.*
-**10x reduction in compute requirements**.
+
+## 🛠️ Troubleshooting
+
+*   **Docker Connection:** If you encounter `Connection Refused` errors, make sure Docker Desktop is active and `docker ps` shows the `memgraph` container running on port `7687`.
+*   **Ollama Connection:** Verify your Ollama instance is serving on the default port `11434` (SiliconBrain connects to Ollama via `http://localhost:11434/v1`).
+*   **Teacher API Keys:** Ensure your DeepSeek API key is correctly configured in your `.env` file for the background learner to operate.
 
 ---
 *Created with the vision of efficient, grounded, and local-first intelligence.*
