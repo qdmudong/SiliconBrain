@@ -10,6 +10,16 @@ SiliconBrain is a high-performance **Neuro-Symbolic Framework** designed to run 
 
 ![Knowledge Map Demo](assets/knowledge_map_demo.png)
 
+## 💡 Quick Walkthrough: From Learning to Generation
+
+Here is a typical end-to-end flow of how SiliconBrain operates:
+
+1. **Train the Brain (Mastery):** You ask the **Mastery Engine** to learn many Python topics (e.g., *"Python Memory Management and PyObject header"*). The system interrogates a high-IQ Teacher LLM, extracts declarative facts (triples) and procedural workflow steps, and writes them to the local **Memgraph** database. **After adequate training, the brain will have accumulated a rich Python knowledge base.**
+2. **Generate Python Scripts:** When you ask the agent, *"Write a script that accesses a PyObject header to inspect refcounts,"* the orchestrator intercepts the query.
+3. **Save 90%+ Tokens:** Instead of feeding hundreds of lines of raw manuals or documentation context to the LLM (dense retrieval), SiliconBrain performs **sparse graph activation**. It retrieves only the specific nodes and relationships related to your request from the graph, saving significant token overhead and allowing a tiny local model like llama3.2:3b to write fully correct code instantly.
+
+---
+
 ## 🚧 Project Status: Proof of Concept
 
 SiliconBrain is a **functional research prototype** of a general-purpose Neuro-Symbolic AI system. While it ships with a massive pre-loaded library for software engineering, the underlying architecture is designed to **master any technical or creative domain** autonomously.
