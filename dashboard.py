@@ -16,7 +16,9 @@ if "brain" not in st.session_state:
     st.session_state.brain = SiliconBrainPhase3()
 
 # --- BACKGROUND INGESTOR SERVICE ---
-if "ingestor_thread" not in st.session_state:
+import sys
+if not hasattr(sys, "_siliconbrain_ingestor_started"):
+    sys._siliconbrain_ingestor_started = True
     import threading
     from layers.ingestor import HungryBrain
     if not os.path.exists("data/ingest"):
@@ -31,7 +33,6 @@ if "ingestor_thread" not in st.session_state:
             
     t = threading.Thread(target=run_ingestor, daemon=True)
     t.start()
-    st.session_state.ingestor_thread = t
 
 # --- HELPER FUNCTIONS ---
 def refresh_brain_map():

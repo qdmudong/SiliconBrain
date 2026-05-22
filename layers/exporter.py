@@ -39,8 +39,12 @@ def export_brain(output_path="data/trained_brain.cypher"):
                 props_list = [f"{k}: {json_repr(v)}" for k, v in rel.items()]
                 props_str = f" {{{', '.join(props_list)}}}" if props_list else ""
                 
+                # Use JSON representation for names to handle nested single/double quotes safely in Cypher
+                s_name_esc = json_repr(s_name)
+                o_name_esc = json_repr(o_name)
+                
                 # We assume nodes are identified by name for simplicity in MERGE
-                query = f"MATCH (s {{name: '{s_name}'}}), (o {{name: '{o_name}'}}) MERGE (s)-[:{r_type}{props_str}]->(o);\n"
+                query = f"MATCH (s {{name: {s_name_esc}}}), (o {{name: {o_name_esc}}}) MERGE (s)-[:{r_type}{props_str}]->(o);\n"
                 f.write(query)
                 rel_count += 1
                 
