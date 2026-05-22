@@ -34,6 +34,15 @@ with tab1:
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+            if message["role"] == "assistant" and message.get("metrics"):
+                metrics = message["metrics"]
+                with st.expander("📊 Comparative Token Efficiency Report", expanded=False):
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Dense Baseline", f"{metrics['baseline_total']} t")
+                    col2.metric("Sparse Graph", f"{metrics['sparse_total']} t")
+                    col3.metric("Tokens Saved", f"{metrics['savings']} t")
+                    col4.metric("Reduction", f"{metrics['reduction_ratio']}%")
+                    st.caption(f"🔋 Energy Profile: {metrics['energy_profile']}")
 
     # Chat Input
     if prompt := st.chat_input("Ask me anything about your project..."):
@@ -62,8 +71,19 @@ with tab1:
 
             # Final response
             response = result.get("final_response", "I encountered an error during reasoning.")
+            metrics = result.get("efficiency_metrics")
             st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+            
+            if metrics:
+                with st.expander("📊 Comparative Token Efficiency Report", expanded=True):
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Dense Baseline", f"{metrics['baseline_total']} t")
+                    col2.metric("Sparse Graph", f"{metrics['sparse_total']} t")
+                    col3.metric("Tokens Saved", f"{metrics['savings']} t")
+                    col4.metric("Reduction", f"{metrics['reduction_ratio']}%")
+                    st.caption(f"🔋 Energy Profile: {metrics['energy_profile']} (Local Ollama vs Cloud Dense)")
+            
+            st.session_state.messages.append({"role": "assistant", "content": response, "metrics": metrics})
 
 # --- TAB 2: BRAIN MAP ---
 with tab2:

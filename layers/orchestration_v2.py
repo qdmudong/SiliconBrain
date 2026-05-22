@@ -8,13 +8,14 @@ from layers.graph_connector import MemgraphConnector
 from config import get_llm_settings
 
 # 1. Define the State
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     user_input: str
     current_state: str
     thought_process: List[str]
     graph_results: List[str]
     history: List[str]
     final_response: str
+    efficiency_metrics: dict
 
 # 2. The Phase 3 Orchestrator
 class SiliconBrainPhase3:
@@ -59,6 +60,7 @@ class SiliconBrainPhase3:
 
     def interpreter(self, state: AgentState):
         """Interpret user input and map it to a starting state in the graph."""
+        self.total_tokens_est = 0
         print("\n" + "="*50)
         print(f"🧠 [INTERPRETER] PHASE START (Model: {self.model_name})")
         print(f"User Input: '{state['user_input']}'")
@@ -219,7 +221,16 @@ class SiliconBrainPhase3:
         print(f"🔋 ENERGY PROFILE: {self.provider == 'LOCAL (20W)' and '~20 Watts' or 'API/Cloud Watts'}")
         print("-" * 40 + "\n")
         
-        return {"final_response": response}
+        return {
+            "final_response": response,
+            "efficiency_metrics": {
+                "baseline_total": baseline_total,
+                "sparse_total": self.total_tokens_est,
+                "savings": max(0, savings),
+                "reduction_ratio": round(ratio, 2),
+                "energy_profile": self.provider == 'LOCAL (20W)' and '~20 Watts' or 'API/Cloud Watts'
+            }
+        }
 
     def build_graph(self):
         workflow = StateGraph(AgentState)
