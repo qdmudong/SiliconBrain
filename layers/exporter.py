@@ -1,16 +1,25 @@
 from layers.graph_connector import MemgraphConnector
 import os
 
-def export_brain(output_path="data/trained_brain.cypher"):
+def export_brain(output_path="data/trained_brain.cypher", name_prefix=None):
     print(f"--- Exporting SiliconBrain Memory to {output_path} ---")
     connector = MemgraphConnector()
     
     with connector.driver.session() as session:
-        # Fetch all nodes and their properties
-        nodes_result = session.run("MATCH (n) RETURN n, labels(n) as labels")
-        
-        # Fetch all relationships
-        rels_result = session.run("MATCH (s)-[r]->(o) RETURN s.name as s_name, type(r) as r_type, r, o.name as o_name")
+        if name_prefix:
+            # Fetch nodes starting with prefix
+            nodes_result = session.run("MATCH (n) WHERE n.name STARTS WITH $prefix RETURN n, labels(n) as labels", prefix=name_prefix)
+            # Fetch relationships between nodes both starting with prefix
+            rels_result = session.run(
+                "MATCH (s)-[r]->(o) WHERE s.name STARTS WITH $prefix AND o.name STARTS WITH $prefix "
+                "RETURN s.name as s_name, type(r) as r_type, r, o.name as o_name",
+                prefix=name_prefix
+            )
+        else:
+            # Fetch all nodes and their properties
+            nodes_result = session.run("MATCH (n) RETURN n, labels(n) as labels")
+            # Fetch all relationships
+            rels_result = session.run("MATCH (s)-[r]->(o) RETURN s.name as s_name, type(r) as r_type, r, o.name as o_name")
         
         with open(output_path, "w") as f:
             f.write("// SiliconBrain Pre-Trained Memory Snapshot\n")

@@ -8,7 +8,9 @@ def acquire_ingestor_lock(lock_path="data/ingestor.lock"):
     Note: flock is process-scoped, meaning it manages lock exclusivity across different OS processes.
     """
     try:
-        os.makedirs(os.path.dirname(lock_path), exist_ok=True)
+        dir_name = os.path.dirname(lock_path)
+        if dir_name:
+            os.makedirs(dir_name, exist_ok=True)
         # Open in write-intent mode
         lock_file = open(lock_path, "a+")
         

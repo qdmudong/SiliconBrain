@@ -53,3 +53,14 @@ else:
 """
         res2 = subprocess.run([sys.executable, "-c", code_succeed], capture_output=True, text=True)
         self.assertEqual(res2.returncode, 0, f"Subprocess should succeed in acquiring lock after parent release. Stderr: {res2.stderr}")
+
+    def test_no_directory_component(self):
+        # Verify that lock acquisition succeeds even with lock files having no directory prefix (relative to cwd)
+        lock_name = "test_ingest_no_dir.lock"
+        try:
+            lock = acquire_ingestor_lock(lock_name)
+            self.assertIsNotNone(lock)
+            release_ingestor_lock(lock)
+        finally:
+            if os.path.exists(lock_name):
+                os.remove(lock_name)

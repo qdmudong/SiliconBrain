@@ -54,7 +54,7 @@ class TestExporterRoundTrip(unittest.TestCase):
 
         # 2. Export brain
         os.makedirs(os.path.dirname(self.test_export_path), exist_ok=True)
-        export_brain(self.test_export_path)
+        export_brain(self.test_export_path, name_prefix="__TEST__")
         self.assertTrue(os.path.exists(self.test_export_path))
 
         # 3. Read the cypher export file to ensure names are double-quoted properly
