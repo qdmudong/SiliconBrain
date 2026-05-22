@@ -18,21 +18,41 @@ if "brain" not in st.session_state:
 # --- BACKGROUND INGESTOR SERVICE ---
 import sys
 if not hasattr(sys, "_siliconbrain_ingestor_started"):
-    sys._siliconbrain_ingestor_started = True
-    import threading
-    from layers.ingestor import HungryBrain
-    if not os.path.exists("data/ingest"):
-        os.makedirs("data/ingest")
-        
-    def run_ingestor():
+    from layers.ingestor_lock import acquire_ingestor_lock, release_ingestor_lock
+    lock_file = acquire_ingestor_lock()
+    if lock_file is not None:
         try:
-            hb = HungryBrain()
-            hb.watch(once=False)
-        except Exception as e:
-            print(f"[INGESTOR THREAD] Ingestor watch failed: {e}")
+            import threading
+            from layers.ingestor import HungryBrain
+            if not os.path.exists("data/ingest"):
+                os.makedirs("data/ingest")
+                
+            def run_ingestor():
+                try:
+                    hb = HungryBrain()
+                    hb.watch(once=False)
+                except Exception as e:
+                    print(f"[INGESTOR THREAD] Ingestor watch failed: {e}")
+                    # Release lock and clear state on execution error
+                    release_ingestor_lock(lock_file)
+                    if hasattr(sys, "_siliconbrain_ingestor_started"):
+                        del sys._siliconbrain_ingestor_started
+                    if hasattr(sys, "_siliconbrain_ingestor_lock"):
+                        del sys._siliconbrain_ingestor_lock
+                    
+            t = threading.Thread(target=run_ingestor, daemon=True)
+            t.start()
             
-    t = threading.Thread(target=run_ingestor, daemon=True)
-    t.start()
+            # Lock acquired and thread spawned successfully - mark as started globally
+            sys._siliconbrain_ingestor_started = True
+            sys._siliconbrain_ingestor_lock = lock_file
+        except Exception as e:
+            print(f"[INGESTOR THREAD] Ingestor thread startup failed: {e}")
+            release_ingestor_lock(lock_file)
+            if hasattr(sys, "_siliconbrain_ingestor_started"):
+                del sys._siliconbrain_ingestor_started
+            if hasattr(sys, "_siliconbrain_ingestor_lock"):
+                del sys._siliconbrain_ingestor_lock
 
 # --- HELPER FUNCTIONS ---
 def refresh_brain_map():

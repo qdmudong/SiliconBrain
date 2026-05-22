@@ -19,6 +19,7 @@ class AgentState(TypedDict, total=False):
     efficiency_metrics: dict
     steps: int
     visited: List[str]
+    cycle_detected: bool
 
 # 2. The Phase 3 Orchestrator
 class SiliconBrainPhase3:
@@ -130,14 +131,16 @@ class SiliconBrainPhase3:
             print("⚠️ WARNING: Maximum execution steps exceeded. Breaking potential loop.")
             return {
                 "current_state": "END_OF_WORKFLOW",
-                "steps": steps
+                "steps": steps,
+                "cycle_detected": False
             }
             
         if visited.count(current) > 2:
             print(f"⚠️ WARNING: Cycle detected for state '{current}'. Breaking potential loop.")
             return {
                 "current_state": "END_OF_WORKFLOW",
-                "steps": steps
+                "steps": steps,
+                "cycle_detected": True
             }
         
         # 1. Get knowledge relevant to this state AND the user input
