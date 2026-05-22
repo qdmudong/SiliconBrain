@@ -15,6 +15,24 @@ if "messages" not in st.session_state:
 if "brain" not in st.session_state:
     st.session_state.brain = SiliconBrainPhase3()
 
+# --- BACKGROUND INGESTOR SERVICE ---
+if "ingestor_thread" not in st.session_state:
+    import threading
+    from layers.ingestor import HungryBrain
+    if not os.path.exists("data/ingest"):
+        os.makedirs("data/ingest")
+        
+    def run_ingestor():
+        try:
+            hb = HungryBrain()
+            hb.watch(once=False)
+        except Exception as e:
+            print(f"[INGESTOR THREAD] Ingestor watch failed: {e}")
+            
+    t = threading.Thread(target=run_ingestor, daemon=True)
+    t.start()
+    st.session_state.ingestor_thread = t
+
 # --- HELPER FUNCTIONS ---
 def refresh_brain_map():
     viz = BrainVisualizer()
@@ -51,9 +69,15 @@ with tab1:
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
+            # Format conversational history
+            chat_history = []
+            for msg in st.session_state.messages[:-1]:
+                chat_history.append({"role": msg["role"], "content": msg["content"]})
+            
             # Initialize the brain state
             inputs = {
                 "user_input": prompt,
+                "chat_history": chat_history,
                 "history": [],
                 "thought_process": [],
                 "graph_results": []

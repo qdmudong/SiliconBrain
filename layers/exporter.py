@@ -33,8 +33,14 @@ def export_brain(output_path="data/trained_brain.cypher"):
                 s_name = record["s_name"]
                 o_name = record["o_name"]
                 r_type = record["r_type"]
+                rel = record["r"]
+                
+                # Extract and format relationship properties
+                props_list = [f"{k}: {json_repr(v)}" for k, v in rel.items()]
+                props_str = f" {{{', '.join(props_list)}}}" if props_list else ""
+                
                 # We assume nodes are identified by name for simplicity in MERGE
-                query = f"MATCH (s {{name: '{s_name}'}}), (o {{name: '{o_name}'}}) MERGE (s)-[:{r_type}]->(o);\n"
+                query = f"MATCH (s {{name: '{s_name}'}}), (o {{name: '{o_name}'}}) MERGE (s)-[:{r_type}{props_str}]->(o);\n"
                 f.write(query)
                 rel_count += 1
                 

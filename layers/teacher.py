@@ -81,9 +81,14 @@ class TeacherInterface:
         print(f"[STUDENT] Mastered topic: {topic}")
         if learned_facts:
             print(f"[STUDENT] Sample learned facts: {learned_facts[:3]}...")
-        self.connector.close()
 
+    def close(self):
+        self.connector.close()
+ 
 if __name__ == "__main__":
     teacher = TeacherInterface()
-    # Let's learn about the core of the Manifesto
-    teacher.distill_knowledge("Spiking Neural Networks and their energy efficiency")
+    try:
+        # Let's learn about the core of the Manifesto
+        teacher.distill_knowledge("Spiking Neural Networks and their energy efficiency")
+    finally:
+        teacher.close()

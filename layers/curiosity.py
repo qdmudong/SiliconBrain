@@ -59,27 +59,29 @@ class CuriosityEngine:
 
     def autonomous_learning_loop(self, iterations=3):
         print(f"--- SiliconBrain Curiosity Engine Started ({iterations} Iterations) ---")
-        for i in range(iterations):
-            print(f"\n--- Learning Cycle {i+1}/{iterations} ---")
-            
-            # 1. Ponder what to learn next
-            new_topic = self.ponder_next_topic()
-            
-            # 2. Use the Teacher to learn it
-            try:
-                self.teacher.distill_knowledge(new_topic)
-            except Exception as e:
-                print(f"[CURIOSITY] Failed to learn {new_topic} due to an error: {e}")
-                print("[CURIOSITY] Moving to the next thought...")
-            
-            # Brief pause to cool down the local LLM
-            if i < iterations - 1:
-                print("[CURIOSITY] Digesting knowledge for 5 seconds...")
-                time.sleep(5)
+        try:
+            for i in range(iterations):
+                print(f"\n--- Learning Cycle {i+1}/{iterations} ---")
                 
-        print("\n--- Curiosity Cycle Complete ---")
-        self.connector.close()
-
+                # 1. Ponder what to learn next
+                new_topic = self.ponder_next_topic()
+                
+                # 2. Use the Teacher to learn it
+                try:
+                    self.teacher.distill_knowledge(new_topic)
+                except Exception as e:
+                    print(f"[CURIOSITY] Failed to learn {new_topic} due to an error: {e}")
+                    print("[CURIOSITY] Moving to the next thought...")
+                
+                # Brief pause to cool down the local LLM
+                if i < iterations - 1:
+                    print("[CURIOSITY] Digesting knowledge for 5 seconds...")
+                    time.sleep(5)
+        finally:
+            print("\n--- Curiosity Cycle Complete (Closing Connectors) ---")
+            self.teacher.close()
+            self.connector.close()
+ 
 if __name__ == "__main__":
     engine = CuriosityEngine()
     engine.autonomous_learning_loop(iterations=2)

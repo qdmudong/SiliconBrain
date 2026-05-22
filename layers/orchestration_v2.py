@@ -14,8 +14,11 @@ class AgentState(TypedDict, total=False):
     thought_process: List[str]
     graph_results: List[str]
     history: List[str]
+    chat_history: List[dict]
     final_response: str
     efficiency_metrics: dict
+    steps: int
+    visited: List[str]
 
 # 2. The Phase 3 Orchestrator
 class SiliconBrainPhase3:
@@ -65,6 +68,11 @@ class SiliconBrainPhase3:
         print(f"🧠 [INTERPRETER] PHASE START (Model: {self.model_name})")
         print(f"User Input: '{state['user_input']}'")
         
+        chat_history = state.get("chat_history", [])
+        chat_history_str = ""
+        if chat_history:
+            chat_history_str = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in chat_history])
+        
         with self.connector.driver.session() as session:
             result = session.run("MATCH (s:State) RETURN s.name as name")
             available_states = [r["name"] for r in result]
@@ -73,9 +81,12 @@ class SiliconBrainPhase3:
         print(f"Memory contains {len(available_states)} workflow states.")
         
         prompt = f"""
+        Conversation History:
+        {chat_history_str}
+        
         User Input: {state['user_input']}
         
-        Your goal is to map this input to ONE of the available workflow states.
+        Your goal is to map this input (considering the conversation history if relevant) to ONE of the available workflow states.
         Available States (Partial List): {available_states[:20]} ... (and {len(available_states)-20} more)
         
         Return ONLY the state name that best matches. If no specific match, return 'Start'.
@@ -99,13 +110,35 @@ class SiliconBrainPhase3:
             response = "Start"
             
         print(f"🎯 Mapped to State: {response}")
-        return {"current_state": response, "thought_process": [f"Interpreted input as state: {response}"]}
+        return {
+            "current_state": response,
+            "thought_process": [f"Interpreted input as state: {response}"],
+            "steps": 0,
+            "visited": [response]
+        }
 
     def executor(self, state: AgentState):
         """Retrieve knowledge and execute the transition based on the current state."""
         current = state["current_state"]
+        steps = state.get("steps", 0) + 1
+        visited = state.get("visited", [])
+        
         print("\n" + "-"*50)
-        print(f"⚙️ [EXECUTOR] WORKING ON STATE: {current}")
+        print(f"⚙️ [EXECUTOR] WORKING ON STATE: {current} (Step {steps})")
+        
+        if steps > 15:
+            print("⚠️ WARNING: Maximum execution steps exceeded. Breaking potential loop.")
+            return {
+                "current_state": "END_OF_WORKFLOW",
+                "steps": steps
+            }
+            
+        if visited.count(current) > 2:
+            print(f"⚠️ WARNING: Cycle detected for state '{current}'. Breaking potential loop.")
+            return {
+                "current_state": "END_OF_WORKFLOW",
+                "steps": steps
+            }
         
         # 1. Get knowledge relevant to this state AND the user input
         print(f"Searching graph for state context: '{current}'")
@@ -160,11 +193,18 @@ class SiliconBrainPhase3:
                 "current_state": next_state,
                 "graph_results": state["graph_results"] + [str(kg_data)],
                 "thought_process": state["thought_process"] + [f"Executed: {action}. Result: {summary[:50]}..."],
-                "history": state["history"] + [summary]
+                "history": state["history"] + [summary],
+                "steps": steps,
+                "visited": visited + [next_state]
             }
         
         print("No further transitions found in the procedural map.")
-        return {"current_state": "END_OF_WORKFLOW", "graph_results": state["graph_results"] + [str(kg_data)]}
+        return {
+            "current_state": "END_OF_WORKFLOW",
+            "graph_results": state["graph_results"] + [str(kg_data)],
+            "steps": steps,
+            "visited": visited
+        }
 
     def router(self, state: AgentState):
         """Decide if we should continue the workflow."""
@@ -188,7 +228,15 @@ class SiliconBrainPhase3:
         
         print(f"Knowledge fed to final synthesis: {len(relevant_kg)} sources")
 
+        chat_history = state.get("chat_history", [])
+        chat_history_str = ""
+        if chat_history:
+            chat_history_str = "\n".join([f"{msg['role'].upper()}: {msg['content']}" for msg in chat_history])
+
         final_prompt = f"""
+        Conversation History:
+        {chat_history_str}
+        
         Original Request: {state['user_input']}
         Knowledge retrieved from Graph: {relevant_kg}
         Execution Steps & Outputs: {state['history']}
